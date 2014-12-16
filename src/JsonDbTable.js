@@ -29,18 +29,51 @@ define([], function(undefined) {
 		this.rows.push(row);
 	};
 
-	JsonDbTable.prototype.toHash = function() {
-		var json = {
-			  name: this.getName
-			, columns: []
-			, rows: []
-		};
+	JsonDbTable.prototype.removeRow = function(rowId) {
+		for (var x in this.rows) {
+			if (this.rows[x].getId() == rowId) {
+				this.rows.splice(x, 1);
+				return;
+			}
+		}
+	};
+
+	/**
+	 * @returns {JsonDbColumn[]}
+	 */
+	JsonDbTable.prototype.getColumns = function() {
+		var result = [];
 
 		var keys = Object.keys(this.columns);
 		for (var x in keys) {
 			var key = keys[x];
-			json.columns.push(this.columns[key].toHash());
+			result.push(this.columns[key]);
 		}
+
+		return result;
+	};
+
+	/**
+	 * @returns {JsonDbRow[]}
+	 */
+	JsonDbTable.prototype.getRows = function() {
+		return this.rows;
+	};
+
+	JsonDbTable.prototype.hasIdColumn = function() {
+		if (this.columns['_id']) {
+			return true;
+		}
+
+		return false;
+	};
+
+	JsonDbTable.prototype.toHash = function() {
+		var json = {
+			  name: this.getName()
+			, columns: this.getColumns()
+			, rows: []
+		};
 
 		for (var i=0; i!=this.rows.length; i++) {
 			json.rows.push(this.rows[i].toHash());

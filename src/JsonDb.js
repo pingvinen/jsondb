@@ -25,8 +25,38 @@ define([], function(undefined) {
 			}
 		}
 
+		if (!tbl.hasIdColumn()) {
+			tbl.addColumn(this.factory.getColumn('_id'));
+		}
+
 		this.tables[name] = tbl;
 	}
+
+	/**
+	 * @returns {JsonDbTable[]}
+	 */
+	JsonDb.prototype.getTables = function() {
+		var result = [];
+
+		var keys = Object.keys(this.tables);
+		for (var x in keys) {
+			var key = keys[x];
+			result.push(this.tables[key].toHash());
+		}
+
+		return result;
+	};
+
+	/**
+	 * @returns {JsonDbTable}
+	 */
+	JsonDb.prototype.getTable = function(name) {
+		if (this.tables[name]) {
+			return this.tables[name];
+		}
+
+		return null;
+	};
 
 	JsonDb.prototype.addRow = function(tableName, object) {
 		if (!this.tables[tableName]) {
@@ -49,19 +79,19 @@ define([], function(undefined) {
 		table.addRow(row);
 	};
 
-	JsonDb.prototype.toHash = function() {
-		var json = {
-			tables: []
-		};
-
-		var keys = Object.keys(this.tables);
-		for (var x in keys) {
-			var key = keys[x];
-			json.tables.push(this.tables[key].toHash());
+	JsonDb.prototype.removeRow = function(tableName, rowId) {
+		var table = this.getTable(tableName);
+		if (table === null) {
+			throw tableName + ' does not exist in this db';
 		}
 
+		table.removeRow(rowId);
+	};
 
-		return json;
+	JsonDb.prototype.toHash = function() {
+		return {
+			tables: this.getTables()
+		}
 	};
 
 
