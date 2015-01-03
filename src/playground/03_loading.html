@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <title>03: Loading</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style type="text/css">
+		thead td {
+			font-weight: bold;
+		}
+
+		td, th {
+			padding: 7px;
+			text-align: left;
+		}
+
+		tbody tr:hover {
+			background-color: #f00;
+		}
+	</style>
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+	<h1>03: Loading</h1>
+
+	<div id="source"></div>
+
+	<table id="table" cellspacing="0">
+		<thead>
+			<tr>
+				<th>_id</th>
+				<th>name</th>
+				<th>rgb</th>
+				<th>hex</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<script src="require.js"></script>
+	<script type="text/javascript">
+		require(['common.js', 'fixbrowserinconsistencies.js'], function(common) {
+			require(['JsonDbFactory'], function(jsonDbFactory) {
+
+				var sourceDb = jsonDbFactory.getDb();
+				sourceDb.addTable('colors', ['name', 'rgb', 'hex']);
+
+				sourceDb.addRow('colors', {
+					  name: 'red'
+					, rgb: '255,0,0'
+					, hex: 'f00'
+				});
+
+				sourceDb.addRow('colors', {
+					  name: 'green'
+					, rgb: '0,255,0'
+					, hex: '0f0'
+				});
+
+				sourceDb.addRow('colors', {
+					  name: 'blue'
+					, rgb: '0,0,255'
+					, hex: '00f'
+				});
+
+				document.getElementById('source').innerHTML = sourceDb.toJson();
+
+				function rowToTableRow(row, tr) {
+					var td = null;
+
+					td = tr.insertCell(-1);
+					td.innerHTML = row.getValue('_id');
+
+					td = tr.insertCell(-1);
+					td.innerHTML = row.getValue('name');
+
+					td = tr.insertCell(-1);
+					td.innerHTML = row.getValue('rgb');
+
+					td = tr.insertCell(-1);
+					td.innerHTML = row.getValue('hex');
+				}
+
+				function dbToTable(db) {
+					var table = document.getElementById('table');
+					var tbody = table.tBodies[0];
+
+					// clear existing rows
+					var newTbody = document.createElement('tbody');
+					tbody.parentNode.replaceChild(newTbody, tbody);
+					tbody = newTbody;
+
+					var colors = db.getTable('colors');
+					var columns = colors.getColumns();
+					var rows = colors.getRows();
+
+					var tr = null;
+					var col = null;
+					var td = null;
+					for (var x in rows) {
+						tr = tbody.insertRow();
+						rowToTableRow(rows[x], tr);						
+					}
+				};
+
+
+				var loadedDb = jsonDbFactory.getDb();
+				loadedDb.load(document.getElementById('source').innerHTML);
+
+				dbToTable(loadedDb);
+			});
+		});
+	</script>
+</body>
+</html>

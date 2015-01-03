@@ -103,11 +103,29 @@ define([], function(undefined) {
 		}
 	};
 
-
 	JsonDb.prototype.toJson = function() {
 		return JSON.stringify(this.toHash());
 	};
 
+	JsonDb.prototype.load = function(json) {
+		var hash = JSON.parse(json);
+
+		if (hash.tables === undefined) {
+			throw 'tables must be defined';
+		}
+
+		var entry = null;
+
+		for (var x in hash.tables) {
+			entry = hash.tables[x];
+
+			this.addTable(entry.name, entry.columns);
+
+			for (var y in entry.rows) {
+				this.addRow(entry.name, entry.rows[y].values);
+			}
+		}
+	};
 
 	return JsonDb;
 });
