@@ -18,6 +18,14 @@
 		tbody tr:hover {
 			background-color: #f00;
 		}
+
+		input.id-input {
+			width: 19em;
+		}
+
+		input.name-input, input.rgb-input, input.hex-input {
+			width: 5em;
+		}
 	</style>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -77,30 +85,46 @@
 				});
 
 				
+				function getInputField(value, classes) {
+					var elm = document.createElement('input');
+					elm.setAttribute('type', 'text');
+					elm.defaultValue = value;
+					elm.setAttribute('class', classes);
+
+					return elm;
+				}
+
 				function rowToTableRow(row, tr) {
 					var td = null;
 
 					td = tr.insertCell(-1);
-					td.innerHTML = row.getValue('_id');
+					td.appendChild(getInputField(row.getValue('_id'), 'id-input'));
 
 					td = tr.insertCell(-1);
-					td.innerHTML = row.getValue('name');
+					td.appendChild(getInputField(row.getValue('name'), 'name-input'));
 
 					td = tr.insertCell(-1);
-					td.innerHTML = row.getValue('rgb');
+					td.appendChild(getInputField(row.getValue('rgb'), 'rgb-input'));
 
 					td = tr.insertCell(-1);
-					td.innerHTML = row.getValue('hex');
+					td.appendChild(getInputField(row.getValue('hex'), 'hex-input'));
 
 
-					var btn = document.createElement('button');
-					btn.innerHTML = 'delete';
-					btn.onclick = function() {
+					var deleteBtn = document.createElement('button');
+					deleteBtn.innerHTML = 'delete';
+					deleteBtn.onclick = function() {
 						deleteRow(row.getId());
+					};
+
+					var saveBtn = document.createElement('button');
+					saveBtn.innerHTML = 'save';
+					saveBtn.onclick = function(event) {
+						saveRow(event);
 					};
 					
 					td = tr.insertCell(-1);
-					td.appendChild(btn);
+					td.appendChild(deleteBtn);
+					td.appendChild(saveBtn);
 				}
 
 				function dbToTable(db) {
@@ -125,7 +149,6 @@
 					}
 				};
 
-				console.log(db);
 				dbToTable(db);
 
 
@@ -148,6 +171,24 @@
 
 				function deleteRow(rowId) {
 					db.removeRow('colors', rowId);
+					dbToTable(db);
+				}
+
+				function saveRow(event) {
+					var btn = event.toElement;
+					var tr = btn.parentNode.parentNode;
+
+					var id = tr.getElementsByClassName('id-input')[0].value;
+					var name = tr.getElementsByClassName('name-input')[0].value;
+					var rgb = tr.getElementsByClassName('rgb-input')[0].value;
+					var hex = tr.getElementsByClassName('hex-input')[0].value;
+
+					db.updateRow('colors', id, {
+						  name: name
+						, rgb: rgb
+						, hex: hex
+					});
+
 					dbToTable(db);
 				}
 			});

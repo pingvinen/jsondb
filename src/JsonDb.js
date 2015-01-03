@@ -88,6 +88,15 @@ define([], function(undefined) {
 		table.removeRow(rowId);
 	};
 
+	JsonDb.prototype.updateRow = function(tableName, rowId, object) {
+		var table = this.getTable(tableName);
+		if (table === null) {
+			throw tableName + ' does not exist in this db';
+		}
+
+		table.updateRow(rowId, object);
+	};
+
 	JsonDb.prototype.toHash = function() {
 		return {
 			tables: this.getTables()

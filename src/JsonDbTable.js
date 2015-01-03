@@ -38,6 +38,15 @@ define([], function(undefined) {
 		}
 	};
 
+	JsonDbTable.prototype.updateRow = function(rowId, object) {
+		for (var x in this.rows) {
+			if (this.rows[x].getId() == rowId) {
+				this.rows[x].update(object);
+				return;
+			}
+		}
+	};
+
 	/**
 	 * @returns {JsonDbColumn[]}
 	 */

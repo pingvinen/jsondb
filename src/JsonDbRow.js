@@ -29,6 +29,19 @@ define([], function(undefined) {
 		return null;
 	};
 
+	JsonDbRow.prototype.update = function(object) {
+		var keys = Object.keys(object);
+
+		if (keys.indexOf('_id') != -1) {
+			throw 'You cannot update the ID of a row';
+		}
+
+		for (var x in keys) {
+			var key = keys[x];
+			this.setValue(key, object[key]);
+		}
+	};
+
 	JsonDbRow.prototype.toHash = function() {
 		return {
 			values: this.values
