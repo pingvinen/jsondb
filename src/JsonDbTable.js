@@ -39,12 +39,23 @@ define([], function(undefined) {
 	};
 
 	JsonDbTable.prototype.updateRow = function(rowId, object) {
-		for (var x in this.rows) {
-			if (this.rows[x].getId() == rowId) {
-				this.rows[x].update(object);
-				return;
+		var row = this.getById();
+
+		if (row != null) {
+			row.update(object);
+		}
+	};
+
+	JsonDbTable.prototype.getById = function(rowId) {
+		if (this.hasIdColumn()) {
+			for (var x in this.rows) {
+				if (this.rows[x].getId() == rowId) {
+					return this.rows[x];				
+				}
 			}
 		}
+
+		return null;
 	};
 
 	/**
